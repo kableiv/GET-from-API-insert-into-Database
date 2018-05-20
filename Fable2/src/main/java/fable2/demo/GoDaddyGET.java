@@ -1,27 +1,39 @@
 package fable2.demo;
 
-import com.jayway.jsonpath.DocumentContext;
 import files.Resources;
 import files.ReusableMethods;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import net.minidev.json.JSONArray;
+import jdk.nashorn.internal.parser.JSONParser;
+import net.minidev.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
+import net.minidev.json.JSONArray;
+import com.jayway.jsonpath.DocumentContext;
+import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 public class GoDaddyGET {
+
+    @Qualifier("datasource")
+    @Autowired
+    DataSource dataSource;
 
 
     Properties prop = new Properties();
@@ -36,7 +48,7 @@ public class GoDaddyGET {
     }
 
 
-    public void Test(){
+    public void Test() throws ParseException {
 
         // write your code here
 
@@ -81,6 +93,9 @@ public class GoDaddyGET {
             createdArray.add(createdAtSource);
 
 
+            String expiresFinal = "";
+            String createdFinal = "";
+
 
             System.out.println(domainName);
             System.out.println(domainId);
@@ -90,7 +105,7 @@ public class GoDaddyGET {
                 if (dateStr != null){
 
                     LocalDateTime parse = LocalDateTime.parse(expiresSource, DateTimeFormatter.ISO_DATE_TIME);
-                    String expiresFinal = parse.format(DateTimeFormatter.ofPattern("dd MM yyyy hha"));
+                    expiresFinal = parse.format(DateTimeFormatter.ofPattern("dd MM yyyy hha"));
                     System.out.println(expiresFinal);
                 }
             }
@@ -101,12 +116,19 @@ public class GoDaddyGET {
                 if (dateStr != null){
 
                     LocalDateTime parse2 = LocalDateTime.parse(createdAtSource, DateTimeFormatter.ISO_DATE_TIME);
-                    String createdFinal = parse2.format(DateTimeFormatter.ofPattern("dd MM yyyy hha"));
+                    createdFinal = parse2.format(DateTimeFormatter.ofPattern("dd MM yyyy hha"));
                     System.out.println(createdFinal);
                 }
             }
+
+
+            ReusableMethods.insertData(domainId, domainName, status, expiresFinal, renewAuto, createdFinal, "Godaddy" );
+
         }
         System.out.println(count);
+
+
+
 
 
 
